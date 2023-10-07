@@ -1,28 +1,38 @@
 from Chess.Pieces.piece import Piece
 
+BOARD_SIZE = 8
+
 
 class Bishop(Piece):
     def __init__(self, color, position):
         super().__init__("B", color, position)
 
     def get_legal_moves(self, board, move_history=None, pieces=None):
-        # Generate a list of legal moves for the bishop based on its movement patterns and the current board state
+        """ Generate the legal moves for the bishop """
         legal_moves = []
+        direction_offsets = [
+            (1, 1), (1, -1), (-1, 1), (-1, -1)
+        ]
 
-        # Check the squares that the bishop can move to in each direction
-        for row_offset, col_offset in [[1, 1], [1, -1], [-1, 1], [-1, -1]]:
-            new_row = self.position[0] + row_offset
-            new_col = self.position[1] + col_offset
-            while 0 <= new_row < 8 and 0 <= new_col < 8:
-                # Check if the square is occupied by a friendly piece
-                if board[new_row][new_col] is None or board[new_row][new_col].color != self.color:
+        for offset in direction_offsets:
+            new_row, new_col = self._position[0] + offset[0], self._position[1] + offset[1]
+
+            while self._is_within_board(new_row, new_col):
+                if board[new_row][new_col] is None:
                     legal_moves.append((new_row, new_col))
-                # Stop iterating if the square is occupied by an enemy piece
-                if board[new_row][new_col] is not None:
-                    break
-                new_row += row_offset
-                new_col += col_offset
+                else:
+                    if board[new_row][new_col].color != self.color:
+                        legal_moves.append((new_row, new_col))
+                    break  # Bishop's path is blocked by a piece (either friendly or enemy)
+
+                new_row += offset[0]
+                new_col += offset[1]
+
         return legal_moves
+
+    def _is_within_board(self, row, col):
+        """ Check if the given square is within the board """
+        return 0 <= row < BOARD_SIZE and 0 <= col < BOARD_SIZE
 
     def get_value(self):
         # TODO: Implement a better evaluation function

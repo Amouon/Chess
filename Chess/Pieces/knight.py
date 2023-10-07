@@ -1,28 +1,32 @@
 from Chess.Pieces.piece import Piece
 
+BOARD_SIZE = 8
+CENTRAL_SQUARES = {(3, 3), (3, 4), (4, 3), (4, 4)}
+
 
 class Knight(Piece):
     def __init__(self, color, position):
         super().__init__("N", color, position)
 
     def get_legal_moves(self, board, move_history=None, pieces=None):
-        # Generate a list of legal moves for the knight based on its movement patterns and the current board state
+        """ Returns a list of legal moves for the knight. """
         legal_moves = []
+        knight_moves = [
+            (-2, -1), (-2, 1), (-1, -2), (-1, 2),
+            (1, -2), (1, 2), (2, -1), (2, 1)
+        ]
 
-        # Check the eight squares that the knight can move to
-        for row_offset in [-2, -1, 1, 2]:
-            for col_offset in [-2, -1, 1, 2]:
-                if abs(row_offset) == abs(col_offset):
-                    continue
-                new_row = self._position[0] + row_offset
-                new_col = self._position[1] + col_offset
-                if 0 <= new_row < 8 and 0 <= new_col < 8:
-                    # Check if the square is occupied by a friendly piece
-                    if board[new_row][new_col] is None or board[new_row][new_col].color != self.color:
-                        legal_moves.append((new_row, new_col))
+        for offset in knight_moves:
+            new_row, new_col = self._position[0] + offset[0], self._position[1] + offset[1]
+
+            if self._is_within_board(new_row, new_col) and \
+                    (board[new_row][new_col] is None or board[new_row][new_col].color != self.color):
+                legal_moves.append((new_row, new_col))
 
         return legal_moves
-        pass
+
+    def _is_within_board(self, row, col):
+        return 0 <= row < BOARD_SIZE and 0 <= col < BOARD_SIZE
 
     def get_value(self, board, move_history=None) -> float:
         # TODO: Implement a better evaluation function
