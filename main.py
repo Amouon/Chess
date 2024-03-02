@@ -8,7 +8,7 @@ from Chess.Repository.ChessRepository import ChessRepository
 from Chess.UI.console import UI
 
 if __name__ == "__main__":
-    use_gui = False
+    use_gui = True
     chess_repository = ChessRepository()
     chess_repository.initialize_board()
     game_state = GameState(chess_repository)

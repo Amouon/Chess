@@ -48,8 +48,9 @@ class ChessGUI(QObject):
             for col in range(8):
                 square = QWidget(self.central_widget)
                 square.setAccessibleDescription(self.characters[col] + str(8 - row))
-                square.setStyleSheet("background-color: #F0D9B5" if (col + row) % 2 == 0
-                                     else "background-color: #B58863")
+                square.setStyleSheet("background-color: #F0D9B5;" if (col + row) % 2 == 0
+                                     else "background-color: #B58863;")
+                square.setFixedSize(100, 100)
                 square.installEventFilter(self)
                 self.grid_layout.addWidget(square, row, col)
 
@@ -182,12 +183,13 @@ class ChessGUI(QObject):
 
     def remove_pending_moves(self):
         """ Removes the highlighted squares """
-        for i in range(self.grid_layout.count()):
-            square = self.grid_layout.itemAt(i).widget()
-            row = i // 8
-            col = i % 8
-            square.setStyleSheet("background-color: #F0D9B5" if (col + row) % 2 == 0
-                                 else "background-color: #B58863")
+        for row in range(8):
+            for col in range(8):
+                index = row * 8 + col
+                square = self.grid_layout.itemAt(index).widget()
+                if square is not None:
+                    color = "#F0D9B5" if (row + col) % 2 == 0 else "#B58863"
+                    square.setStyleSheet(f"background-color: {color};")
 
 
 if __name__ == "__main__":

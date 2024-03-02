@@ -94,7 +94,10 @@ class TensorConverter:
 
     def convert_for_prediction(self, fen: str):
         """ Convert a board from FEN notation to a tensor for prediction.
-         :param fen: The FEN notation of the board """
+        :param fen: The FEN notation of the board
+
+        :return: The tensor of the board and the tensor of the turn
+        """
 
         board_tensor = []
 

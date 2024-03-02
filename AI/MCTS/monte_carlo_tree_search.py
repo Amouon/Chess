@@ -1,5 +1,6 @@
 import io
 import pickle
+import dill
 import pstats
 import math
 from collections import deque
@@ -120,7 +121,7 @@ class MCTS:
 
          :param node: The node to expand
          :return: The new child node """
-        next_state = pickle.loads(pickle.dumps(node.state, -1))
+        next_state = dill.copy(node.state)
         try:
             next_state.play_random_move()
         except Checkmate:
@@ -135,7 +136,7 @@ class MCTS:
 
          :param node: The node to simulate from
          :return: The result of the simulation """
-        state = pickle.loads(pickle.dumps(node.state, -1))
+        state = dill.copy(node.state)
         # start = time.time()
         while not state.board.game_over:
             hashtable_result = self.hashtable.lookup(state)
@@ -204,17 +205,17 @@ if __name__ == "__main__":
     mcts = MCTS(chess_state, iterations=2)
     start = time.time()
     while not chess_state.board.game_over:
-        # pr = cProfile.Profile()
-        # pr.enable()
+        pr = cProfile.Profile()
+        pr.enable()
         move = mcts.select_move(chess_state)
-        # pr.disable()
-        # s = io.StringIO()
-        #  sortby = 'cumulative'
-        #  ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-        # ps.print_stats()
-        # print(s.getvalue())
-        # print(move)
+        pr.disable()
+        s = io.StringIO()
+        sortby = 'tottime'
+        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        ps.print_stats()
+        print(s.getvalue())
+        print(move)
         print(f"\nTime taken on average/game: {(time.time() - start)/20}")
         chess_state.make_move(move)
-        # mcts.set_current_node(chess_state)
+        mcts.set_current_node(chess_state)
         print_board(chess_state.get_board())
