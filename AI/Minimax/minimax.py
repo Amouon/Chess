@@ -1,4 +1,5 @@
 import pickle
+import dill
 import time
 from typing import Tuple
 
@@ -33,7 +34,7 @@ class Minimax:
             return state.get_value() * self.color
         value = float('inf')
         for move in state.possible_moves():
-            child_state = pickle.loads(pickle.dumps(state, -1))
+            child_state = dill.copy(state)
             try:
                 child_state.make_move(move)
             except IllegalMove:
@@ -64,7 +65,7 @@ class Minimax:
             return state.get_value() * self.color
         value = float('-inf')
         for move in state.possible_moves():
-            child_state = pickle.loads(pickle.dumps(state, -1))
+            child_state = dill.copy(state)
             try:
                 child_state.make_move(move)
             except IllegalMove:
@@ -93,7 +94,7 @@ class Minimax:
         alpha = float('-inf')
         beta = float('inf')
         for move in self.state.possible_moves():
-            child_state = pickle.loads(pickle.dumps(self.state, -1))
+            child_state = dill.copy(self.state)
             try:
                 child_state.make_move(move)
             except IllegalMove:
