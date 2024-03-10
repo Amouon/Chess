@@ -10,6 +10,8 @@ from Testcases.ChessTest.PiecesTest.pawn_test import PawnTest
 from Testcases.ChessTest.PiecesTest.queen_test import QueenTest
 from Testcases.ChessTest.PiecesTest.rook_test import RookTest
 from Testcases.ChessTest.ChessRepository_test import ChessRepositoryTest
+from Testcases.CommonTest.HashTable_test import HashTableTest
+from Testcases.CommonTest.PrimeHandler_test import PrimeHandlerTest
 
 
 def run_some_tests():
@@ -21,7 +23,9 @@ def run_some_tests():
         # Test the classes for the board
         ChessRepositoryTest, GameStateTest,
         # Test the AI classes
-        MCTSTest, MinimaxTest
+        MCTSTest, MinimaxTest,
+        # Test the classes from the Common package
+        HashTableTest, PrimeHandlerTest
     ]
 
     loader = TestLoader()
