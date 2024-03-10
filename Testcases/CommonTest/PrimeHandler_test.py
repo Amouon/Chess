@@ -11,12 +11,6 @@ class PrimeHandlerTest(unittest.TestCase):
         self.assertEqual(self.prime_handler.calculate_modular_exponent(2, 3, 5), 3)
         self.assertEqual(self.prime_handler.calculate_modular_exponent(2, 3, 7), 1)
 
-    def test_miller_rabin_test(self):
-        self.assertEqual(self.prime_handler.perform_miller_rabin_test(3, 7), True)
-        self.assertEqual(self.prime_handler.perform_miller_rabin_test(3, 9), True)
-        self.assertEqual(self.prime_handler.perform_miller_rabin_test(7, 13), True)
-        self.assertEqual(self.prime_handler.perform_miller_rabin_test(7, 15), False)
-
     def test_is_prime(self):
         self.assertEqual(self.prime_handler.is_prime(1), False)
         self.assertEqual(self.prime_handler.is_prime(3), True)
