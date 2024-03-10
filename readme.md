@@ -28,6 +28,8 @@
 - `MCTS`: Implements Monte Carlo Tree Search algorithm for AI.
   - `MCTSNode`: Implements the node of the MCTS tree.
 - `Minimax`: Implements Minimax algorithm for AI.
+- `HashTable`: Implements a hash table used for the MCTS & Minimax algorithms.
+  - `PrimeHandler`: Implements a class that handles prime numbers needed for the hash table.
 - `GUI`: Implements the graphical user interface.
 - `UI`: Implements the command line user interface.
 - `Piece`: Base class for all chess pieces.
@@ -42,8 +44,3 @@
 
 ### Documentation
 - For more information about the classes and methods, you can find their documentation in the Documentation folder.
-
-### Known issues
-- The Minimax algorithm on low depth tends to get stuck in local optimums, resulting in it playing the same move over and over again. For example, it might move the rook back and forth until the end of the game.
-- The HashTable implementation for the Minimax algorithm is not working properly, so it is not used in the current version of the project.
-- The CNN has a limited dataset, therefore it is not as accurate as it could be.
