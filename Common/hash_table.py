@@ -34,23 +34,19 @@ class HashTable:
                 return item[1]  # Return the stored value and move
         return None
 
-    def store(self, fen: str, value: int | float, move):
-        """ Store the value and best move for the current state in the hash table
-
-         :param fen: The given FEN
-         :param value: The value of the current state
-         :param move: The best move for the current state"""
-
+    def store(self, fen: str, value, move):
+        """Store the value and best move for the given FEN in the hash table."""
+        h = self.compute_hash(fen)
+        for index, item in enumerate(self.table[h]):
+            if item[0] == fen:
+                # Replace the existing tuple with a new one that includes the updated value and move
+                self.table[h][index] = (fen, (value, move))
+                return
+        # If the FEN was not found, append a new entry
+        self.table[h].append((fen, (value, move)))
+        self.count += 1
         if self.count / self.size > self.load_factor_threshold:
             self.resize()
-
-        h = self.compute_hash(fen)
-        for item in self.table[h]:
-            if item[0] == fen:
-                item[1] = (value, move)  # Update existing entry
-                return
-        self.table[h].append((fen, (value, move)))  # Add new entry
-        self.count += 1
 
     def resize(self):
         """ Resize the hash table once the load factor exceeds the threshold """

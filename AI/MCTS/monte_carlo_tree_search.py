@@ -8,7 +8,6 @@ from datetime import time
 
 from AI.CNN.ConvolutionalNeuralNetwork import ConvolutionalNeuralNetwork
 from AI.MCTS.Exceptions.LosingState import LosingState
-from AI.hash_table import HashTable
 from AI.MCTS.monte_carlo_node import MCTSNode
 from Chess.Repository.ChessRepository import ChessRepository
 from Chess.Board.GameState import GameState
@@ -16,6 +15,8 @@ from Chess.utils.move_handlers import print_board
 from Chess.Exceptions.Checkmate import Checkmate
 import time
 import cProfile
+
+from Common.hash_table import HashTable
 
 
 class MCTS:
@@ -44,7 +45,7 @@ class MCTS:
         self.iterations = iterations  # The number of iterations to perform
         self.exploration_constant = exploration_constant  # The exploration constant, sqrt(2) by default
         self.root = MCTSNode(state)
-        self.hashtable = HashTable(1009)  # The hashtable to store the results of the simulations
+        self.hashtable = HashTable()  # The hashtable to store the results of the simulations
         self.current_node = self.root
         self.depth_limit = depth_limit
         self.use_opening_book = use_opening_book
@@ -99,7 +100,7 @@ class MCTS:
                 return node
             if self.depth_limit and depth >= self.depth_limit:
                 return node
-            hashtable_result = self.hashtable.lookup(node.state)
+            hashtable_result = self.hashtable.lookup(node.state.fen())
             if hashtable_result:
                 value, move = hashtable_result
                 if node.state.board.turn == "w":
@@ -139,7 +140,7 @@ class MCTS:
         state = dill.copy(node.state)
         # start = time.time()
         while not state.board.game_over:
-            hashtable_result = self.hashtable.lookup(state)
+            hashtable_result = self.hashtable.lookup(state.fen())
             if hashtable_result:
                 value, move = hashtable_result
                 if state.board.turn == "w":
