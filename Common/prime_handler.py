@@ -45,7 +45,7 @@ class PrimeHandler:
         :param iterations: The number of iterations to perform
 
         :return: True if the number is prime, False otherwise."""
-        if number <= 1 or number == 4:
+        if number <= 1:
             return False
         if number <= 3:
             return True
