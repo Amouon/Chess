@@ -1,22 +1,5 @@
 ## Monte Carlo Tree Search
-- This contains the documentation for the MCTSNode and MCTS classes.
-
-### Monte Carlo Tree Search Node (MCTSNode)
-- The MCTSNode class implements the nodes of the Monte Carlo Tree Search algorithm.
-
-#### Properties
-- `state`: The GameState object that manages the game logic and the rules.
-- `parent`: The parent node.
-- `children`: A list of the children nodes.
-- `move`: The move that was made to get to this node.
-- `visits`: The number of times the node was visited.
-- `wins`: The number of times the node was visited and the player won.
-- `alpha`: The alpha value of the node.
-- `beta`: The beta value of the node.
-
-#### Methods
-- `not_fully_expanded()`: Returns `True` if the node is not fully expanded and `False` otherwise.
-- `ucb1(exploration_constant)`: Returns the UCB1 value of the node.
+- This contains the documentation for the MCTS class.
 
 ### Monte Carlo Tree Search (MCTS)
 - The MCTS class implements the Monte Carlo Tree Search algorithm. The algorithm has alpha-beta pruning, hashtables and a transposition table implemented to speed up the search.
