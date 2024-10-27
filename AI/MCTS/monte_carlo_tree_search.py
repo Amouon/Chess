@@ -158,9 +158,11 @@ class MCTS:
                     # print(e)
                     # end = time.time()
                     # print(end - start)
+                    self.hashtable.store(state.fen(), state.board.result, state.board.history[-1])
                     return state.board.result
         # end = time.time()
         # print(end - start)
+        self.hashtable.store(state.fen(), state.board.result, state.board.history[-1])
         return state.board.result
 
     def _backpropagate(self, node: MCTSNode, result: int):
