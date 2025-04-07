@@ -58,11 +58,11 @@ class UI:
         """ Print the board
 
          :param board: The board to print"""
-        for i in range(len(board.board)):
+        for i in range(len(board.repository)):
             string = []
-            for j in range(len(board.board[i])):
-                if board.board[i][j] is not None:
-                    string.append(board.board[i][j])
+            for j in range(len(board.repository[i])):
+                if board.repository[i][j] is not None:
+                    string.append(board.repository[i][j])
                 else:
                     string.append("")
             print(string)
@@ -78,16 +78,16 @@ class UI:
         else:
             self.ai = Minimax(self.state, difficulty, color)
 
-        while not self.state.board.game_over:
-            if self.state.board.turn == color:
+        while not self.state.repository.game_over:
+            if self.state.repository.turn == color:
                 move = self.ai.select_move(self.state)
                 self.state.make_move(move)
-                self.print_board(self.state.board)
+                self.print_board(self.state.repository)
             else:
                 move = input("Your move: ")
                 try:
                     self.state.make_move(move)
-                    self.print_board(self.state.board)
+                    self.print_board(self.state.repository)
                 except IllegalMove as e:
                     print(e)
                 except WrongColor as e:

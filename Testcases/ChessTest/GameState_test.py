@@ -31,7 +31,7 @@ class GameStateTest(unittest.TestCase):
         self.game_state.make_move("e2e4")
         self.game_state.make_move("d7d5")
         self.game_state.make_move("e4d5")
-        self.assertEqual(len(self.game_state.board.pieces), 31)
+        self.assertEqual(len(self.game_state.repository.pieces), 31)
 
     def test_king_check_simulation(self):
         self.game_state.make_move("f2f4")
@@ -117,9 +117,9 @@ class GameStateTest(unittest.TestCase):
         test_repository.initialize_board("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
         test_game_state = GameState(test_repository)
         test_game_state.make_move("e1g1")
-        self.assertEqual(isinstance(test_game_state.board.board[0][6], King), True)
+        self.assertEqual(isinstance(test_game_state.repository.board[0][6], King), True)
         test_game_state.make_move("e8c8")
-        self.assertEqual(isinstance(test_game_state.board.board[7][2], King), True)
+        self.assertEqual(isinstance(test_game_state.repository.board[7][2], King), True)
 
     def test_fen(self):
         self.assertEqual(self.game_state.fen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
@@ -140,14 +140,14 @@ class GameStateTest(unittest.TestCase):
         test_repository.initialize_board("k7/7P/8/8/8/8/8/4K3 w - - 0 1")
         test_game_state = GameState(test_repository)
         test_game_state.make_move("h7h8")
-        self.assertEqual(isinstance(test_game_state.board.board[7][7], Queen), True)
+        self.assertEqual(isinstance(test_game_state.repository.board[7][7], Queen), True)
 
     def test_play_random_move(self):
         test_repository = ChessRepository()
         test_repository.initialize_board("k7/7p/7P/8/8/8/8/4K3 w - - 0 1")
         test_game_state = GameState(test_repository)
         test_game_state.play_random_move(["h6h7"])
-        self.assertEqual(test_game_state.board.board[0][0], None)
+        self.assertEqual(test_game_state.repository.board[0][0], None)
 
 
 if __name__ == '__main__':

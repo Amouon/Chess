@@ -33,15 +33,15 @@ def convert_to_algebraic_notation(position):
     return chr(col + 97) + str(row + 1)
 
 
-def print_board(board):
+def print_board(repository):
     """ Print the board
 
      :param board: The board to print"""
-    for i in range(len(board.board)):
+    for i in range(len(repository.board)):
         string = []
-        for j in range(len(board.board[i])):
-            if board.board[i][j] is not None:
-                string.append(board.board[i][j])
+        for j in range(len(repository.board[i])):
+            if repository.board[i][j] is not None:
+                string.append(repository.board[i][j])
             else:
                 string.append("")
         print(string)
