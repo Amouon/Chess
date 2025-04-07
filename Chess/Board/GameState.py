@@ -152,8 +152,10 @@ class GameState:
         self.board.pieces = [piece for row in self.board.board for piece in row if piece is not None]
         self.board.number_of_moves += 1
 
-        # TODO: Check if the king is in checkmate
-        # TODO: Check if the king is in stalemate
+        legal_moves_for_current_player = self.possible_moves()
+
+        # Check if the game is over
+        self._check_game_status()
 
         # Check if the game is over due to insufficient material
         if self.is_insufficient_material():
@@ -234,6 +236,28 @@ class GameState:
         algebraic_notation = convert_to_algebraic_notation((move.start_row, move.start_col)) + convert_to_algebraic_notation((move.end_row, move.end_col))
         self.board.history.remove(algebraic_notation)
 
+    def _check_game_status(self):
+        """ Check if the game is over
+
+        :return: None
+        """
+
+        possible_moves_for_current_player = self.possible_moves()
+        if not possible_moves_for_current_player:
+            # Check if the game is over due to checkmate
+            if self.king_pieces[self.board.turn].is_in_check(self.board.board, self.board.pieces, self.board.history):
+                self.board.game_over = True
+                self.board.result = 1 if self.board.turn == "b" else 0
+                raise Checkmate(f'Game over: {"1-0" if self.board.turn == "b" else "0-1"}!')
+
+            # Check if the game is over due to stalemate
+            else:
+                self.board.game_over = True
+                self.board.result = 0.5
+                raise Checkmate(f'Game over: 1/2-1/2!')
+
+
+
     def get_board(self):
         """ Returns the board
 
@@ -252,16 +276,54 @@ class GameState:
         return piece.get_legal_moves(self.board.board, self.board.history, self.board.pieces)
 
     def possible_moves(self):
-        """ Return all possible moves for the current player
+        """
+        Return all truly legal moves for the current player, filtering out any moves
+        that would leave or keep that player's own king in check.
+        """
+        candidate_moves = []
+        # 1) Gather all piece-level moves (all pseudo-legal moves)
+        for piece in self.board.pieces:
+            if piece.color == self.board.turn:
+                start_algebraic = convert_to_algebraic_notation(piece.position)
+                for end_pos in piece.get_legal_moves(
+                        self.board.board,
+                        self.board.history,
+                        self.board.pieces
+                ):
+                    move_str = start_algebraic + convert_to_algebraic_notation(end_pos)
+                    candidate_moves.append(move_str)
 
-         :return: A list of all possible moves for the current player"""
-        # TODO: Remove the moves that put the king in check
-        moves = []
-        for i in self.board.pieces:
-            if i.color == self.board.turn:
-                for move in self.get_legal_moves(convert_to_algebraic_notation(i.position)):
-                    moves += [convert_to_algebraic_notation(i.position) + convert_to_algebraic_notation(move)]
-        return moves
+        # 2) Simulate each move and check if the king is in check
+        legal_moves = []
+        for move in candidate_moves:
+            move_record = MoveRecord(
+                start_row=process_location(move[:2])[0],
+                start_col=process_location(move[:2])[1],
+                end_row=process_location(move[2:])[0],
+                end_col=process_location(move[2:])[1],
+                moved_piece=self.board.board[process_location(move[:2])[0]][process_location(move[:2])[1]],
+                captured_piece=self.board.board[process_location(move[2:])[0]][process_location(move[2:])[1]],
+                old_castling_rights=(False, False),
+                old_en_passant_square=None,
+                old_half_moves=self.board.half_moves,
+                old_turn=self.board.turn
+            )
+
+            # Simulate the move
+            self._push_move(move_record)
+            self._do_move(move_record)
+
+            # Check if the king is in check
+            if self.king_pieces[move_record.old_turn].is_in_check(self.board.board, self.board.pieces, self.board.history):
+                # If yes, revert
+                self._undo_move()
+                continue
+
+            # If the move was legal, add it to the list of legal moves
+            self._undo_move()
+            legal_moves.append(move)
+
+        return legal_moves
 
     def play_random_move(self, moves=None):
         """ Play a random legal move
