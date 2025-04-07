@@ -1,4 +1,3 @@
-import pickle
 from random import choice
 from typing import List
 
@@ -44,10 +43,6 @@ class GameState:
         """
         # Update the half-move counter
         self.board.half_moves += 1
-
-        # Make a copy of the board and the pieces
-        # initial_board = pickle.loads(pickle.dumps(self.board.board, -1))
-        # initial_pieces = pickle.loads(pickle.dumps(self.board.pieces, -1))
 
         # Calculate the start and end squares
         end, start = process_algebraic_notation(move)
@@ -140,11 +135,6 @@ class GameState:
         if isinstance(piece, Pawn):
             self.board.half_moves = 0
 
-        # Check if the king is in check after the move
-        if king.is_in_check(self.board.board, self.board.pieces, self.board.history):
-            self.rollback(initial_board, initial_pieces)
-            raise IllegalMove("You can't move a pinned piece")
-
         # Check if the move is a pawn promotion
         if isinstance(piece, Pawn) and (end[0] == 0 or end[0] == 7):
             # Check if the piece is a pawn and if it is on the last rank
@@ -162,46 +152,8 @@ class GameState:
         self.board.pieces = [piece for row in self.board.board for piece in row if piece is not None]
         self.board.number_of_moves += 1
 
-        # Find the enemy king
-        for i in self.board.pieces:
-            if isinstance(i, King) and i.color == self.board.turn:
-                king = i
-                break
-
-        # initial_board = pickle.loads(pickle.dumps(self.board.board, -1))
-        # initial_pieces = pickle.loads(pickle.dumps(self.board.pieces, -1))
-        # Check if the king is in checkmate
-        if king.is_in_check(self.board.board, self.board.pieces, self.board.history):
-            if not king.get_legal_moves(self.board.board, self.board.history, self.board.pieces):
-                # If the king has no legal moves and is in check, it's checkmate
-                self.board.game_over = True
-                self.board.result = 1.0 if self.board.turn == "b" else 0.0
-                raise Checkmate(f'Game over: {"1-0" if self.board.turn == "b" else "0-1"}!')
-
-        # Check if the king is in stalemate
-        # else:
-        #     if not king.get_legal_moves(self.board.board, self.board.history, self.board.pieces):
-        #         # If the king has no legal moves but is not in check, check if the player has any legal moves
-        #         move_found = False
-        #         for i in self.board.pieces:
-        #             move_found = False
-        #             if i.color == self.board.turn:
-        #                 self.rollback(pickle.loads(pickle.dumps(initial_board, -1)),
-        #                               pickle.loads(pickle.dumps(initial_pieces, -1)))
-        #                 if isinstance(i, King):
-        #                     continue
-        #                 legal_moves = i.get_legal_moves(self.board.board, self.board.history, self.board.pieces)
-        #                 if legal_moves:
-        #                     move_found = True
-        #                     break
-        #         if not move_found:
-        #             self.board.game_over = True
-        #             self.rollback(initial_board, initial_pieces)
-        #             self.board.result = 0.5
-        #             raise Checkmate(f'Game over: 1/2-1/2!')
-        #
-        #         self.rollback(pickle.loads(pickle.dumps(initial_board, -1)),
-        #                       pickle.loads(pickle.dumps(initial_pieces, -1)))
+        # TODO: Check if the king is in checkmate
+        # TODO: Check if the king is in stalemate
 
         # Check if the game is over due to insufficient material
         if self.is_insufficient_material():
@@ -281,16 +233,6 @@ class GameState:
         # Parse the move (to get the algebraic notation)
         algebraic_notation = convert_to_algebraic_notation((move.start_row, move.start_col)) + convert_to_algebraic_notation((move.end_row, move.end_col))
         self.board.history.remove(algebraic_notation)
-
-    def rollback(self, board, pieces):
-        """ Function to roll back the board and pieces to a previous state
-
-         :param board: The board to roll back to
-         :param pieces: The pieces to roll back to
-
-         :return: None"""
-        self.board.board = board
-        self.board.pieces = pieces
 
     def get_board(self):
         """ Returns the board
