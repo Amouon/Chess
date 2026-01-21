@@ -1,4 +1,3 @@
-from Chess.Board.GameState import GameState
 from Common.prime_handler import PrimeHandler
 
 
@@ -10,40 +9,64 @@ class HashTable:
         self.size = initial_size
         self.count = 0
         self.load_factor_threshold = 0.7
-        self.table = [[] for _ in range(self.size)]
+        self.table = [None] * self.size
         self.prime_handler = PrimeHandler()
 
-    def compute_hash(self, fen: str) -> int:
-        """ Create a unique hash value for the current FEN (excluding the turn counter),
-         which doesn't have a major impact on the position
+    def compute_fnv1a_hash(self, position: str) -> int:
+        hash = 0xcbf29ce484222325
+        fnv_prime = 0x100000001b3
 
-         :param fen: The FEN string of the position
-         :return: The hash value"""
+        for byte in position.encode('utf-8'):
+            hash ^= byte
+            hash *= fnv_prime
+            hash &= 0xFFFFFFFFFFFFFFFF
 
-        fen_key = fen.rsplit(' ', 2)[0]
-        return hash(fen_key) % self.size
+        return hash % self.size
+
+    def double_hash(self, hash1: int, i: int, position: str) -> int:
+        """ Double hashing implementation to reduce collisions.
+        We use a second hash function to calculate the step size.
+
+        :param hash1: The primary hash value
+        :param i: The current probe count (collision count)
+        :param position: The key being inserted/searched
+        :return: The recalculated hash value after applying double hashing
+        """
+        hash2 = 1 + (self.compute_fnv1a_hash(position) % (self.size - 1))
+        return (hash1 + i * hash2) % self.size
 
     def lookup(self, fen: str):
         """ Look up the value and best move for the given FEN in the hash table
 
          :param fen: The given FEN
          :return: The value and best move for the position"""
-        h = self.compute_hash(fen)
-        for item in self.table[h]:
-            if item[0] == fen:
-                return item[1]  # Return the stored value and move
+        position = fen.split(' ', 1)[0]
+        h = self.compute_fnv1a_hash(position) % self.size
+        i = 0
+
+        while self.table[h] is not None:
+            if self.table[h][0] == position:
+                return self.table[h][1]  # Return the stored value and move
+            i += 1
+            h = self.double_hash(h, i, position)
         return None
 
     def store(self, fen: str, value, move):
         """Store the value and best move for the given FEN in the hash table."""
-        h = self.compute_hash(fen)
-        for index, item in enumerate(self.table[h]):
-            if item[0] == fen:
+        position = fen.split(' ', 1)[0]
+        h = self.compute_fnv1a_hash(position)
+        i = 0
+
+        while self.table[h] is not None:
+            if self.table[h][0] == position:
                 # Replace the existing tuple with a new one that includes the updated value and move
-                self.table[h][index] = (fen, (value, move))
+                self.table[h] = (position, (value, move))
                 return
-        # If the FEN was not found, append a new entry
-        self.table[h].append((fen, (value, move)))
+            i += 1
+            h = self.double_hash(h, i, position)
+
+        # If the position was not found, insert a new entry
+        self.table[h] = (position, (value, move))
         self.count += 1
         if self.count / self.size > self.load_factor_threshold:
             self.resize()
@@ -52,12 +75,13 @@ class HashTable:
         """ Resize the hash table once the load factor exceeds the threshold """
         self.size = self._next_prime()
         old_table = self.table
-        self.table = [[] for _ in range(self.size)]
+        self.table = [None] * self.size
         self.count = 0
 
         for entry in old_table:
-            for fen, data in entry:
-                self.store(fen, *data)
+            if entry is not None:
+                position, data = entry
+                self.store(position, *data)
 
     def _next_prime(self) -> int:
         """ Finds the next prime greater than 2 times the current size
@@ -66,3 +90,7 @@ class HashTable:
         """
 
         return self.prime_handler.generate_prime(2 * self.size)
+
+    def dump(self):
+        """ Dump the hash table """
+        return self.table

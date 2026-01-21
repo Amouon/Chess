@@ -16,10 +16,11 @@
 - `fen()`: Returns the FEN string of the current position.
 
 #### Example
+
 ```python
 chess_repository = ChessRepository()
 chess_repository.initialize_board()
-print(chess_repository.board)
+print(chess_repository.repository)
 # Output: [[wR,   wN,   wB,   wQ,   wK,   wB,   wN,   wR  ],
 #          [wP,   wP,   wP,   wP,   wP,   wP,   wP,   wP  ],
 #          [None, None, None, None, None, None, None, None],
@@ -32,8 +33,8 @@ print(chess_repository.board)
 print(chess_repository.fen())
 # Output: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 
-chess_repository.remove_piece(chess_repository.board[0][0])
-print(chess_repository.board)
+chess_repository.remove_piece(chess_repository.repository[0][0])
+print(chess_repository.repository)
 # Output: [[None, wN,   wB,   wQ,   wK,   wB,   wN,   wR  ],
 #          [wP,   wP,   wP,   wP,   wP,   wP,   wP,   wP  ],
 #          [None, None, None, None, None, None, None, None],

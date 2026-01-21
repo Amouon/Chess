@@ -75,7 +75,7 @@ class ChessGUI(QObject):
 
     def createPieces(self):
         """ Creates the pieces on the board """
-        for col in self.chess.board.board:
+        for col in self.chess.repository.board:
             for element in col:
                 if element is not None:
                     piece = QLabel(self.central_widget)

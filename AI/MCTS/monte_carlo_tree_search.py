@@ -1,5 +1,4 @@
 import io
-import pickle
 import dill
 import pstats
 import math
@@ -95,7 +94,7 @@ class MCTS:
          :param node: The node to select from
          :param depth: The depth of the node
          :return: The selected node """
-        while not node.state.board.game_over:
+        while not node.state.repository.game_over:
             if node.not_fully_expanded():
                 return node
             if self.depth_limit and depth >= self.depth_limit:
@@ -103,7 +102,7 @@ class MCTS:
             hashtable_result = self.hashtable.lookup(node.state.fen())
             if hashtable_result:
                 value, move = hashtable_result
-                if node.state.board.turn == "w":
+                if node.state.repository.turn == "w":
                     if value >= node.beta:
                         return node
                 else:
@@ -128,7 +127,7 @@ class MCTS:
         except Checkmate:
             return node
         new_node = MCTSNode(next_state, parent=node, alpha=node.alpha, beta=node.beta,
-                            move=next_state.board.history[-1], cnn=self.cnn)
+                            move=next_state.repository.history[-1], cnn=self.cnn)
         node.children.append(new_node)
         return new_node
 
@@ -139,11 +138,11 @@ class MCTS:
          :return: The result of the simulation """
         state = dill.copy(node.state)
         # start = time.time()
-        while not state.board.game_over:
+        while not state.repository.game_over:
             hashtable_result = self.hashtable.lookup(state.fen())
             if hashtable_result:
                 value, move = hashtable_result
-                if state.board.turn == "w":
+                if state.repository.turn == "w":
                     if value >= node.beta:
                         return -1
                     node.alpha = max(node.alpha, value)
@@ -158,10 +157,12 @@ class MCTS:
                     # print(e)
                     # end = time.time()
                     # print(end - start)
-                    return state.board.result
+                    self.hashtable.store(state.fen(), state.repository.result, state.repository.history[-1])
+                    return state.repository.result
         # end = time.time()
         # print(end - start)
-        return state.board.result
+        self.hashtable.store(state.fen(), state.repository.result, state.repository.history[-1])
+        return state.repository.result
 
     def _backpropagate(self, node: MCTSNode, result: int):
         """ Backpropagate the result of the simulation from the terminal node to the root node
@@ -205,7 +206,7 @@ if __name__ == "__main__":
     chess_state = GameState(chess_repository)
     mcts = MCTS(chess_state, iterations=2)
     start = time.time()
-    while not chess_state.board.game_over:
+    while not chess_state.repository.game_over:
         pr = cProfile.Profile()
         pr.enable()
         move = mcts.select_move(chess_state)

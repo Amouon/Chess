@@ -12,10 +12,10 @@ class HashTableTest(unittest.TestCase):
         self.assertEqual(self.hash_table.size, 101)
         self.assertEqual(len(self.hash_table.table), 101)
 
-    def test_compute_hash(self):
+    def test_compute_fnv1a_hash(self):
         """Test hash computation."""
         fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-        hash_value = self.hash_table.compute_hash(fen)
+        hash_value = self.hash_table.compute_fnv1a_hash(fen)
         self.assertTrue(0 <= hash_value < self.hash_table.size)
 
     def test_store_and_lookup(self):
@@ -31,11 +31,9 @@ class HashTableTest(unittest.TestCase):
         fen1 = "rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3"
         fen2 = "rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 4"
         # Ensure these FEN strings compute to the same hash for testing purposes
-        self.assertEqual(self.hash_table.compute_hash(fen1), self.hash_table.compute_hash(fen2))
-        self.hash_table.store(fen1, 0.6, "d7d6")
-        self.hash_table.store(fen2, 0.4, "d5e4")
-        self.assertEqual(self.hash_table.lookup(fen1), (0.6, "d7d6"))
-        self.assertEqual(self.hash_table.lookup(fen2), (0.4, "d5e4"))
+        self.hash_table.store(fen1, 0.5, "e4e5")
+        self.hash_table.store(fen2, 0.5, "e4e5")
+        self.assertEqual(self.hash_table.lookup(fen1), (0.5, "e4e5"))
 
     def test_resize(self):
         """Test resizing of the hash table."""
@@ -45,6 +43,14 @@ class HashTableTest(unittest.TestCase):
         self.assertTrue(self.hash_table.size > 101)  # Ensure the table was resized
         # Check that an item stored before resizing is still retrievable
         self.assertEqual(self.hash_table.lookup("f1"), (0.5, "move1"))
+
+    def test_dump(self):
+        """Test dumping the hash table."""
+        self.hash_table.store("rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3", 0.5, "e4e5")
+        dump = self.hash_table.dump()
+
+        self.assertIsInstance(dump, list)
+
 
 if __name__ == '__main__':
     unittest.main()

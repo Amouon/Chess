@@ -6,7 +6,6 @@
 
 #### Methods
 - `make_move(move)`: Makes the move on the board.
-- `rollback(board, pieces)`: Rolls back the board and the pieces to the previous state.
 - `get_board()`: Returns the ChessRepository object.
 - `get_legal_moves(start)`: Returns the legal moves for the piece at the start square.
 - `possible_moves()`: Returns all the possible moves for the current player.
